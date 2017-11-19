@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using PVBPS_Antivirus.Config;
 
 namespace PVBPS_Antivirus
 {
@@ -20,9 +21,12 @@ namespace PVBPS_Antivirus
     /// </summary>
     public partial class MainWindow
     {
+        private ConfigGateway _config = new ConfigGateway();
+
         public MainWindow()
         {
             InitializeComponent();
+            string configIndexRule = _config.IndexRule;
         }
     }
 }

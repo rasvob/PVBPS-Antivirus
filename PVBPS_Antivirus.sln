@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PVBPS_Antivirus", "PVBPS_Antivirus\PVBPS_Antivirus.csproj", "{73C35A3A-8E36-4856-A35B-B84180F402AA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiVirusLib", "AntiVirusLib\AntiVirusLib.csproj", "{E6B7E556-2994-46D5-AF77-644E355F9AF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{73C35A3A-8E36-4856-A35B-B84180F402AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73C35A3A-8E36-4856-A35B-B84180F402AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73C35A3A-8E36-4856-A35B-B84180F402AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6B7E556-2994-46D5-AF77-644E355F9AF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6B7E556-2994-46D5-AF77-644E355F9AF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6B7E556-2994-46D5-AF77-644E355F9AF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6B7E556-2994-46D5-AF77-644E355F9AF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
