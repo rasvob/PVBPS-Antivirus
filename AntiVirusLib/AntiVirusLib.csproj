@@ -40,13 +40,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\IMapper.cs" />
+    <Compile Include="Database\IXmlDatabaseProvider.cs" />
+    <Compile Include="Database\DatabaseMapper.cs" />
     <Compile Include="FileInfo\FileTypeChecker.cs" />
     <Compile Include="Models\FileModel.cs" />
+    <Compile Include="Models\ScanModel.cs" />
+    <Compile Include="Models\VirusTotalReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scanner\MalwareScanner.cs" />
+    <Compile Include="Signatures\ByteArrayExt.cs" />
+    <Compile Include="Signatures\HashCreator.cs" />
+    <Compile Include="Signatures\YaraGateway.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Database\" />
-    <Folder Include="Signatures\" />
     <Folder Include="VirusTotal\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

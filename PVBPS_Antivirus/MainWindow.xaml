@@ -9,11 +9,63 @@
         GlowBrush="{StaticResource AccentColorBrush}"
         Icon="icon.png"
         BorderThickness="1"
+        d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:viewModels="clr-namespace:PVBPS_Antivirus.ViewModels"
         Title="PVBPS Antivirus" 
         Height="600" 
         Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
         
+        <Grid Grid.Row="0" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0"
+                     controls:TextBoxHelper.UseFloatingWatermark="True"
+                     controls:TextBoxHelper.Watermark="File path"
+                     controls:TextBoxHelper.WatermarkAlignment="Left"
+                     IsReadOnly="True"
+                     Margin="0,0,10,0"
+            />
+            <Button Grid.Column="1" Content="Open file" Width="100" Command="{Binding OpenFileCommand}"/>
+            <Button Grid.Column="2" Content="Open folder" Margin="5,0,0,0" Width="100" Command="{Binding OpenFolderCommand}"/>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="5,5,5,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Fast scan"/>
+            <Button Grid.Column="1" Content="Full scan (includes online scanning)" Margin="10,0,0,0"/>
+        </Grid>
+        
+        <Grid Grid.Row="2">
+            <ScrollViewer>
+                <ListBox ItemsSource="{Binding Models, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <Label>Path</Label>
+                                <TextBlock Text="{Binding FilePath}"/>
+                                <Label>Name</Label>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </Grid>
+
     </Grid>
 </controls:MetroWindow>

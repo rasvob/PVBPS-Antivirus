@@ -9,5 +9,6 @@ namespace PVBPS_Antivirus.Config
         public string CustomRule => ConfigurationManager.AppSettings["YaraPath"];
         public string DbPath => ConfigurationManager.AppSettings["YaraPath"];
         public string QuarantinePath => ConfigurationManager.AppSettings["YaraPath"];
+        public string ApiKey => ConfigurationManager.AppSettings["ApiKey"];
     }
 }
