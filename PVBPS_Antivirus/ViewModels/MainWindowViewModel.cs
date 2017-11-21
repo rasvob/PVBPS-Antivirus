@@ -1,9 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Xml.Linq;
+using AntiVirusLib.Database;
 using AntiVirusLib.Models;
+using AntiVirusLib.Scanner;
 using Microsoft.Win32;
+using PVBPS_Antivirus.Config;
 using Application = System.Windows.Application;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
@@ -11,7 +18,9 @@ namespace PVBPS_Antivirus.ViewModels
 {
     public class MainWindowViewModel: BaseViewModel
     {
-        public ObservableCollection<FileModel> Models { get; set; }
+        private readonly MalwareScanner _scanner;
+
+        public ObservableCollection<SampleViewModel> Models { get; set; }
 
         private string _filePath;
 
@@ -37,7 +46,10 @@ namespace PVBPS_Antivirus.ViewModels
             OpenFolderCommand = new SimpleCommand(OpenFolderCommandExecute);
             FastScanCommand = new SimpleCommand(FastScanCommandExecute, FastScanCommandCanExecute);
             DeepScanCommand = new SimpleCommand(DeepScanCommandExecute, FastScanCommandCanExecute);
-            Models = new ObservableCollection<FileModel>();
+            Models = new ObservableCollection<SampleViewModel>();
+
+            ConfigGateway configGateway = new ConfigGateway();
+            _scanner = new MalwareScanner(configGateway.YaraPath, configGateway.IndexRule, configGateway.CustomRule, configGateway.DbPath, configGateway.QuarantinePath, configGateway.ApiKey);
         }
 
         private void OpenFolderCommandExecute(object o)
@@ -46,23 +58,44 @@ namespace PVBPS_Antivirus.ViewModels
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string name = openFileDialog.SelectedPath;
+                FilePath = openFileDialog.SelectedPath;
+
+                IEnumerable<string> files = Directory.EnumerateFiles(FilePath);
+                IEnumerable<FileModel> models = files.Select(t => new FileModel() {FilePath = t, Name = Path.GetFileNameWithoutExtension(t)});
+                
+                Models.Clear();
+                foreach (FileModel model in models)
+                {
+                    Models.Add(new SampleViewModel() {FileModel = model, Pos = Models.Count});
+                }
             }
         }
 
         private void DeepScanCommandExecute(object o)
         {
-            throw new NotImplementedException();
+            
         }
 
         private bool FastScanCommandCanExecute(object o)
         {
-            throw new NotImplementedException();
+            return Models != null && Models.Any();
         }
 
         private void FastScanCommandExecute(object o)
         {
-            throw new NotImplementedException();
+            foreach (var model in Models)
+            {
+                FileModel fileModel = model.FileModel;
+                _scanner.FastScan(fileModel);
+
+                if (!fileModel.IsClean)
+                {
+                    _scanner.SaveToDb(fileModel);
+                }
+
+                model.FileModel = null;
+                model.FileModel = fileModel;
+            }
         }
 
         private void OpenFileCommandExecute(object o)
@@ -72,9 +105,11 @@ namespace PVBPS_Antivirus.ViewModels
 
             if (!result.HasValue || !result.Value) return;
 
-            string file = fileDialog.FileName;
+            FilePath = fileDialog.FileName;
             fileDialog.Reset();
-            Models.Add(new FileModel() {FilePath = file});
+            Models.Clear();
+            FileModel model = new FileModel() {FilePath = FilePath, Name = Path.GetFileNameWithoutExtension(FilePath)};
+            Models.Add(new SampleViewModel() { FileModel = model, Pos = Models.Count });
         }
     }
 }

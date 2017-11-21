@@ -4,7 +4,7 @@ using AntiVirusLib.Database;
 
 namespace AntiVirusLib.Models
 {
-    public class VirusTotalReport: IXmlDatabaseProvider
+    public class VirusTotalReport
     {
         public string VirusTotalReportJson { get; set; }
         public string ScanId { get; set; }
@@ -16,16 +16,6 @@ namespace AntiVirusLib.Models
         public VirusTotalReport()
         {
             Scans = new List<ScanModel>();
-        }
-
-        public XElement ToXml()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void FromXml(XElement element)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

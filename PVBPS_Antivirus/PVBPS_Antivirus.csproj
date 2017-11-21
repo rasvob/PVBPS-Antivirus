@@ -64,7 +64,10 @@
     </ApplicationDefinition>
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\Converters\SampleStateColorValueConverter.cs" />
+    <Compile Include="ViewModels\Converters\SampleStateValueConverter.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\SampleViewModel.cs" />
     <Compile Include="ViewModels\SimpleCommand.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

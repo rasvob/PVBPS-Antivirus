@@ -7,6 +7,6 @@ namespace AntiVirusLib.Database
     {
         IEnumerable<T> ListAll();
         T FindOne(string key);
-        void Insert(T model);
+        void Save(T model);
     }
 }

@@ -22,39 +22,19 @@ namespace AntiVirusLib.Models
 
         public XElement ToXml()
         {
-            XElement ele = new XElement("malware");
-
+            XElement ele = new XElement("sample");
             XElement name = new XElement("name") {Value = Name};
             XElement md5 = new XElement("md5") {Value = Md5Hash};
-            XElement sha1 = new XElement("md5") {Value = Sha1Hash};
-            XElement sha256 = new XElement("md5") {Value = Sha256Hash};
+            XElement sha1 = new XElement("sha1") {Value = Sha1Hash};
+            XElement sha256 = new XElement("sha256") {Value = Sha256Hash};
             XElement scanTime = new XElement("scanned") {Value = ScanTime.ToString("O")};
-            XElement clean = new XElement("clean") {Value = IsClean.ToString()};
 
             ele.Add(name);
             ele.Add(md5);
             ele.Add(sha1);
             ele.Add(sha256);
-            ele.Add(sha256);
             ele.Add(scanTime);
-            ele.Add(clean);
 
-            if (VirusTotalReport.ScanId != null)
-            {
-                XElement xVirus = VirusTotalReport.ToXml();
-                ele.Add(xVirus);
-            }
-
-            if (MatchedSignatures.Any())
-            {
-                XElement xVirus = new XElement("yara");
-
-                IEnumerable<XElement> elements = MatchedSignatures.Select(t => new XElement("name") { Value = t });
-                xVirus.Add(elements);
-
-                ele.Add(xVirus);
-            }
-            
             return ele;
         }
 
@@ -66,7 +46,38 @@ namespace AntiVirusLib.Models
 
         public void FromXml(XElement element)
         {
-            throw new NotImplementedException();
+            string name = element.Element("name")?.Value;
+            string scanned = element.Element("scanned")?.Value;
+            string sha1 = element.Element("sha1")?.Value;
+            string sha256 = element.Element("sha256")?.Value;
+            string md5 = element.Element("md5")?.Value;
+
+            if (name != null)
+            {
+                Name = name;
+            }
+
+            if (scanned != null)
+            {
+                ScanTime = DateTime.Parse(scanned);
+            }
+
+            if (sha1 != null)
+            {
+                Sha1Hash = sha1;
+            }
+
+            if (sha256 != null)
+            {
+                Sha256Hash = sha256;
+            }
+
+            if (md5 != null)
+            {
+                Md5Hash = md5;
+            }
+
+            IsClean = false;
         }
 
         public void ComputeHashes()
@@ -80,20 +91,8 @@ namespace AntiVirusLib.Models
         public void RefreshModel(FileModel model)
         {
             Name = model.Name;
-
-            if (model.MatchedSignatures.Any())
-            {
-                MatchedSignatures.Clear();
-                MatchedSignatures.AddRange(model.MatchedSignatures);
-            }
-            
             ScanTime = model.ScanTime;
             IsClean = model.IsClean;
-
-            if (VirusTotalReport.ScanId != null)
-            {
-                VirusTotalReport = model.VirusTotalReport;
-            }
         }
     }
 }

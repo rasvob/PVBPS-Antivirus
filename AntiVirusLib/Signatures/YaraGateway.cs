@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace AntiVirusLib.Signatures
 {
@@ -14,22 +16,29 @@ namespace AntiVirusLib.Signatures
 
         public IEnumerable<string> ScanFile(string filePath, string yarFilePath)
         {
-            string command = filePath + " -w " + yarFilePath + " " + filePath;
-            string performScan = PerformScan(command);
-            return null;
+            string performScan = PerformScan(filePath, yarFilePath);
+            var lines = performScan.Split('\n').Where(t => t.Any()).Select(t => t.Replace("\r", "")).Select(t =>
+            {
+                string[] split = t.Split(' ');
+                return split[0];
+            });
+            return lines;
         }
 
-        private string PerformScan(string payload)
+        private string PerformScan(string payload, string yarFile)
         {
             Process p = new Process
             {
                 StartInfo =
                 {
+                    FileName = YaraPath,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
-                    FileName = payload
+                    Arguments = $"-w {yarFile} {payload}",
+                    CreateNoWindow = true
                 }
             };
+
             p.Start();
             string output = p.StandardOutput.ReadToEnd();
             p.WaitForExit();

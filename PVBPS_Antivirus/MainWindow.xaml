@@ -12,9 +12,16 @@
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:viewModels="clr-namespace:PVBPS_Antivirus.ViewModels"
+        xmlns:converters="clr-namespace:PVBPS_Antivirus.ViewModels.Converters"
         Title="PVBPS Antivirus" 
         Height="600" 
         Width="800">
+    
+    <controls:MetroWindow.Resources>
+        <converters:SampleStateValueConverter x:Key="SampleStateValueConverter" />
+        <converters:SampleStateColorValueConverter x:Key="SampleStateColorValueConverter" />
+    </controls:MetroWindow.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -34,6 +41,7 @@
                      controls:TextBoxHelper.Watermark="File path"
                      controls:TextBoxHelper.WatermarkAlignment="Left"
                      IsReadOnly="True"
+                     Text="{Binding FilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                      Margin="0,0,10,0"
             />
             <Button Grid.Column="1" Content="Open file" Width="100" Command="{Binding OpenFileCommand}"/>
@@ -46,20 +54,78 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Fast scan"/>
-            <Button Grid.Column="1" Content="Full scan (includes online scanning)" Margin="10,0,0,0"/>
+            <Button Grid.Column="0" Content="Fast scan" Command="{Binding FastScanCommand}"/>
+            <Button Grid.Column="1" Content="Full scan (includes online scanning)" Margin="10,0,0,0" Command="{Binding DeepScanCommand}"/>
         </Grid>
         
         <Grid Grid.Row="2">
-            <ScrollViewer>
-                <ListBox ItemsSource="{Binding Models, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            <ScrollViewer x:Name="ScanScrollViewer">
+                <ListBox ItemsSource="{Binding Models, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                         PreviewMouseWheel="UIElement_OnPreviewMouseWheel">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Vertical">
-                                <Label>Path</Label>
-                                <TextBlock Text="{Binding FilePath}"/>
-                                <Label>Name</Label>
-                                <TextBlock Text="{Binding Name}"/>
+                            <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label FontSize="18" Content="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Label FontSize="18" Content="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateValueConverter}}" Foreground="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateColorValueConverter}}" />
+                                    <Label FontSize="18" Content="{Binding FileModel.ScanTime}" />
+                                </StackPanel>
+                                
+                                <TextBox 
+                                         controls:TextBoxHelper.UseFloatingWatermark="True"
+                                         controls:TextBoxHelper.Watermark="Sample name"
+                                         controls:TextBoxHelper.WatermarkAlignment="Left"
+                                         IsReadOnly="True"
+                                         Text="{Binding FileModel.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Margin="0,0,0,5"
+                                />
+
+                                <TextBox 
+                                    controls:TextBoxHelper.UseFloatingWatermark="True"
+                                    controls:TextBoxHelper.Watermark="File path"
+                                    controls:TextBoxHelper.WatermarkAlignment="Left"
+                                    IsReadOnly="True"
+                                    Text="{Binding FileModel.FilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Margin="0,0,0,5"
+                                />
+
+                                <Label FontSize="14" Content="Hash"></Label>
+                                <TextBox 
+                                    controls:TextBoxHelper.UseFloatingWatermark="True"
+                                    controls:TextBoxHelper.Watermark="MD5"
+                                    controls:TextBoxHelper.WatermarkAlignment="Left"
+                                    IsReadOnly="True"
+                                    Text="{Binding FileModel.Md5Hash, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Margin="0,0,0,5"
+                                />
+
+                                <TextBox 
+                                    controls:TextBoxHelper.UseFloatingWatermark="True"
+                                    controls:TextBoxHelper.Watermark="SHA1"
+                                    controls:TextBoxHelper.WatermarkAlignment="Left"
+                                    IsReadOnly="True"
+                                    Text="{Binding FileModel.Sha1Hash, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Margin="0,0,0,5"
+                                />
+
+                                <TextBox 
+                                    controls:TextBoxHelper.UseFloatingWatermark="True"
+                                    controls:TextBoxHelper.Watermark="SHA256"
+                                    controls:TextBoxHelper.WatermarkAlignment="Left"
+                                    IsReadOnly="True"
+                                    Text="{Binding FileModel.Sha256Hash, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Margin="0,0,0,5"
+                                />
+
+                                <Label FontSize="14" Content="Signatures"></Label>
+                                <ListBox ItemsSource="{Binding FileModel.MatchedSignatures, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Label Content="{Binding}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

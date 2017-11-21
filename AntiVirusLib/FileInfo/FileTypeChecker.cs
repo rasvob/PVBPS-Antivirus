@@ -11,6 +11,7 @@ namespace AntiVirusLib.FileInfo
             FileName = fileName;
         }
 
+        //TODO: Byte validation
         public bool IsValid()
         {
             return SimpleExtCheck();
