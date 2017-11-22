@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml.Linq;
 using AntiVirusLib.Database;
 using AntiVirusLib.Models;
 using AntiVirusLib.Scanner;
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using PVBPS_Antivirus.Config;
 using Application = System.Windows.Application;
@@ -73,19 +77,7 @@ namespace PVBPS_Antivirus.ViewModels
 
         private async void DeepScanCommandExecute(object o)
         {
-            foreach (var model in Models)
-            {
-                FileModel fileModel = model.FileModel;
-                await _scanner.DeepScan(fileModel);
-
-                if (!fileModel.IsClean)
-                {
-                    _scanner.SaveToDb(fileModel);
-                }
-
-                model.FileModel = null;
-                model.FileModel = fileModel;
-            }
+            await PerformScan(false);
         }
 
         private bool FastScanCommandCanExecute(object o)
@@ -93,21 +85,9 @@ namespace PVBPS_Antivirus.ViewModels
             return Models != null && Models.Any();
         }
 
-        private void FastScanCommandExecute(object o)
+        private async void FastScanCommandExecute(object o)
         {
-            foreach (var model in Models)
-            {
-                FileModel fileModel = model.FileModel;
-                _scanner.FastScan(fileModel);
-
-                if (!fileModel.IsClean)
-                {
-                    _scanner.SaveToDb(fileModel);
-                }
-
-                model.FileModel = null;
-                model.FileModel = fileModel;
-            }
+            await PerformScan();
         }
 
         private void OpenFileCommandExecute(object o)
@@ -122,6 +102,35 @@ namespace PVBPS_Antivirus.ViewModels
             Models.Clear();
             FileModel model = new FileModel() {FilePath = FilePath, Name = Path.GetFileNameWithoutExtension(FilePath)};
             Models.Add(new SampleViewModel() { FileModel = model, Pos = Models.Count });
+        }
+
+        private async Task PerformScan(bool fast = true)
+        {
+            ProgressDialogController controller = await ((MetroWindow)Application.Current.MainWindow).ShowProgressAsync("Please wait", "Scan in progress...");
+            controller.SetIndeterminate();
+            foreach (var model in Models)
+            {
+                FileModel fileModel = model.FileModel;
+
+                if (fast)
+                {
+                    await _scanner.FastScan(fileModel);
+                }
+                else
+                {
+                    await _scanner.DeepScan(fileModel);
+                }
+
+                if (!fileModel.IsClean)
+                {
+                    _scanner.SaveToDb(fileModel);
+                }
+
+                model.FileModel = null;
+                model.FileModel = fileModel;
+            }
+
+            await controller.CloseAsync();
         }
     }
 }

@@ -66,8 +66,8 @@
                         <DataTemplate>
                             <StackPanel Orientation="Vertical" Margin="0,0,0,10">
                                 <StackPanel Orientation="Horizontal">
-                                    <Label FontSize="18" Content="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                    <Label FontSize="18" Content="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateValueConverter}}" Foreground="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateColorValueConverter}}" />
+                                    <Label FontWeight="Bold" FontSize="18" Content="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Label FontWeight="Bold" FontSize="18" Content="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateValueConverter}}" Foreground="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateColorValueConverter}}" />
                                     <Label FontSize="18" Content="{Binding FileModel.ScanTime}" />
                                 </StackPanel>
                                 
@@ -89,7 +89,7 @@
                                     Margin="0,0,5,5"
                                 />
 
-                                <Label FontSize="14" Content="Hash"></Label>
+                                <Label FontSize="14" Content="Hash" FontWeight="Bold"></Label>
                                 <TextBox 
                                     controls:TextBoxHelper.UseFloatingWatermark="True"
                                     controls:TextBoxHelper.Watermark="MD5"
@@ -117,7 +117,7 @@
                                     Margin="0,0,5,5"
                                 />
 
-                                <Label FontSize="14" Content="Signatures"></Label>
+                                <Label FontSize="14" Content="Detected signatures" FontWeight="Bold"></Label>
                                 <ListBox ItemsSource="{Binding FileModel.MatchedSignatures, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
@@ -125,6 +125,41 @@
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
+
+                                <Label FontSize="14" FontWeight="Bold" Content="Online scan" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Label FontSize="14" FontWeight="Bold" Content="{Binding FileModel.VirusTotalReport.Positives, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Label FontSize="14" Content="positive scans of" />
+                                    <Label FontSize="14" FontWeight="Bold" Content="{Binding FileModel.VirusTotalReport.Total, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Label FontSize="14" Content="total scans" />
+                                </StackPanel>
+
+                                <DataGrid ItemsSource="{Binding FileModel.VirusTotalReport.Scans, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="False"
+                                          CanUserReorderColumns="True"
+                                          CanUserResizeColumns="True"
+                                          CanUserResizeRows="True"
+                                          CanUserSortColumns="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn IsReadOnly="True" Binding="{Binding AvName}" Header="Antivirus" />
+                                        <DataGridTextColumn IsReadOnly="True" Binding="{Binding Result}" Header="Detected as" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <!--<ListBox ItemsSource="{Binding FileModel.VirusTotalReport.Scans, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Label Content="AV: " />
+                                                <Label Content="{Binding AvName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                                <Label Content="Detected: " />
+                                                <Label Content="{Binding Result, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>-->
 
                             </StackPanel>
                         </DataTemplate>

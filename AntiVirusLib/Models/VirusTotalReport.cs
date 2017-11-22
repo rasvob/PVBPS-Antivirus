@@ -39,16 +39,21 @@ namespace AntiVirusLib.Models
                 {
                     var c = o.Children().FirstOrDefault();
 
+                    if (c == null)
+                    {
+                        return new ScanModel() {Detected = false};
+                    }
+
+                    string resultStr = c["result"].Value<string>();
                     var r = new ScanModel()
                     {
                         Detected = c["detected"].Value<bool>(),
-                        Result = c["result"].Value<string>(),
-                        AvName = o.Path
-                       
+                        Result = resultStr == string.Empty ? "Clean" : resultStr,
+                        AvName = o.Path.Substring(o.Path.IndexOf('.')+1)
                     };
 
                     return r;
-                }).ToList();
+                }).Where(t => t.Detected).ToList();
 
                 Scans.Clear();
                 Scans.AddRange(scanModels);
