@@ -71,9 +71,21 @@ namespace PVBPS_Antivirus.ViewModels
             }
         }
 
-        private void DeepScanCommandExecute(object o)
+        private async void DeepScanCommandExecute(object o)
         {
-            
+            foreach (var model in Models)
+            {
+                FileModel fileModel = model.FileModel;
+                await _scanner.DeepScan(fileModel);
+
+                if (!fileModel.IsClean)
+                {
+                    _scanner.SaveToDb(fileModel);
+                }
+
+                model.FileModel = null;
+                model.FileModel = fileModel;
+            }
         }
 
         private bool FastScanCommandCanExecute(object o)
