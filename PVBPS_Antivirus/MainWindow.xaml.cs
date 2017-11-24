@@ -1,4 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System.Reflection.Emit;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using PVBPS_Antivirus.Config;
 using PVBPS_Antivirus.ViewModels;
 
@@ -30,6 +33,14 @@ namespace PVBPS_Antivirus
             }
 
             e.Handled = true;
+        }
+
+        private void ClipBoardMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem item)
+            {
+                _viewModel.CopyToClipboard(item.Tag.ToString());
+            }
         }
     }
 }

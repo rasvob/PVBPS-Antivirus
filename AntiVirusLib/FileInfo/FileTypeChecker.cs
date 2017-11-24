@@ -1,26 +1,25 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using PeNet;
 
 namespace AntiVirusLib.FileInfo
 {
     public class FileTypeChecker
     {
-        public string FileName { get; set; }
-
-        public FileTypeChecker(string fileName)
-        {
-            FileName = fileName;
-        }
-
         //TODO: Byte validation
-        public bool IsValid()
+        public bool IsValid(string file)
         {
-            return SimpleExtCheck();
-        }
-
-        private bool SimpleExtCheck()
-        {
-            string extension = Path.GetExtension(FileName).ToLower();
-            return extension == "exe" || extension == "dll";
+            try
+            {
+                bool isPeFile = PeFile.IsPEFile(file);
+                return isPeFile;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+            return false;
         }
     }
 }

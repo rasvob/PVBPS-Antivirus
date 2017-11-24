@@ -34,7 +34,7 @@ namespace AntiVirusLib.Signatures
                     FileName = YaraPath,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
-                    Arguments = $"-w {yarFile} {payload}",
+                    Arguments = $"-w {yarFile} \"{payload}\"",
                     CreateNoWindow = true
                 }
             };

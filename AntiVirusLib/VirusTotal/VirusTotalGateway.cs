@@ -54,25 +54,40 @@ namespace AntiVirusLib.VirusTotal
             return false;
         }
 
+        public async Task<bool> DeepScanFileSimple(FileModel model)
+        {
+            try
+            {
+                string res = await SendFile(model.FilePath);
+                string rep = await ReadReport(model.Sha256Hash);
+
+                if (rep == string.Empty)
+                {
+                    return false;
+                }
+
+                model.VirusTotalReport.LoadFromJson(rep);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+
+            return model.VirusTotalReport.ScanId != null;
+        }
+
         public async Task<bool> DeepScanFile(FileModel model)
         {
             string res = await SendFile(model.FilePath);
 
             for (int i = 0; i < 3; i++)
             {
-                string rep = string.Empty;
-                for (int j = 0; j < 3; j++)
+                string rep = await ReadReport(model.Sha256Hash);
+
+                if (rep == string.Empty)
                 {
-                    rep = await ReadReport(model.Sha256Hash);
-
-                    if (rep != string.Empty)
-                    {
-                        break;
-                    }
-
-                    await Task.Delay(100);
+                    continue;
                 }
-
 
                 try
                 {

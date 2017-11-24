@@ -10,5 +10,6 @@ namespace PVBPS_Antivirus.Config
         public string DbPath => ConfigurationManager.AppSettings["DbPath"];
         public string QuarantinePath => ConfigurationManager.AppSettings["QuarantinePath"];
         public string ApiKey => ConfigurationManager.AppSettings["ApiKey"];
+        public string StringsPath => ConfigurationManager.AppSettings["StringsPath"];
     }
 }

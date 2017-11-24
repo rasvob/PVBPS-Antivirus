@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml.Linq;
 using AntiVirusLib.Database;
+using AntiVirusLib.FileInfo;
 using AntiVirusLib.Models;
 using AntiVirusLib.Scanner;
 using MahApps.Metro.Controls;
@@ -23,6 +24,7 @@ namespace PVBPS_Antivirus.ViewModels
     public class MainWindowViewModel: BaseViewModel
     {
         private readonly MalwareScanner _scanner;
+        private readonly FileTypeChecker _fileTypeChecker;
 
         public ObservableCollection<SampleViewModel> Models { get; set; }
 
@@ -53,10 +55,16 @@ namespace PVBPS_Antivirus.ViewModels
             Models = new ObservableCollection<SampleViewModel>();
 
             ConfigGateway configGateway = new ConfigGateway();
-            _scanner = new MalwareScanner(configGateway.YaraPath, configGateway.IndexRule, configGateway.CustomRule, configGateway.DbPath, configGateway.QuarantinePath, configGateway.ApiKey);
+            _fileTypeChecker = new FileTypeChecker();
+            _scanner = new MalwareScanner(configGateway.YaraPath, configGateway.IndexRule, configGateway.CustomRule, configGateway.DbPath, configGateway.QuarantinePath, configGateway.ApiKey, configGateway.StringsPath);
         }
 
-        private void OpenFolderCommandExecute(object o)
+        public void CopyToClipboard(string s)
+        {
+            Clipboard.SetText(s);
+        }
+
+        private async void OpenFolderCommandExecute(object o)
         {
             var openFileDialog = new FolderBrowserDialog();
 
@@ -65,12 +73,23 @@ namespace PVBPS_Antivirus.ViewModels
                 FilePath = openFileDialog.SelectedPath;
 
                 IEnumerable<string> files = Directory.EnumerateFiles(FilePath);
-                IEnumerable<FileModel> models = files.Select(t => new FileModel() {FilePath = t, Name = Path.GetFileNameWithoutExtension(t)});
-                
+                List<FileModel> models = files
+                    .Select(t => new FileModel() {FilePath = t, Name = Path.GetFileNameWithoutExtension(t)}).ToList();
+
+                List<FileModel> valid = models.Where(t => _fileTypeChecker.IsValid(t.FilePath)).ToList();
                 Models.Clear();
-                foreach (FileModel model in models)
+                foreach (FileModel model in valid)
                 {
                     Models.Add(new SampleViewModel() {FileModel = model, Pos = Models.Count});
+                }
+
+                List<string> invalidFiles = models.Where(t => !_fileTypeChecker.IsValid(t.FilePath))
+                    .Select(t => Path.GetFileNameWithoutExtension(t.FilePath)).ToList();
+
+                if (invalidFiles.Any())
+                {
+                    string msg = $"Files:\n{string.Join("\n", invalidFiles)}\nare not valid exe or dll";
+                    await ((MetroWindow)Application.Current.MainWindow).ShowMessageAsync("Error", msg);
                 }
             }
         }
@@ -90,7 +109,7 @@ namespace PVBPS_Antivirus.ViewModels
             await PerformScan();
         }
 
-        private void OpenFileCommandExecute(object o)
+        private async void OpenFileCommandExecute(object o)
         {
             var fileDialog = new OpenFileDialog();
             var result = fileDialog.ShowDialog();
@@ -98,19 +117,44 @@ namespace PVBPS_Antivirus.ViewModels
             if (!result.HasValue || !result.Value) return;
 
             FilePath = fileDialog.FileName;
+
+            bool isValid = _fileTypeChecker.IsValid(FilePath);
+
+            if (!isValid)
+            {
+                await ((MetroWindow) Application.Current.MainWindow).ShowMessageAsync("Error",
+                    "Given file is not valid exe or dll, please try another one");
+            }
+
             fileDialog.Reset();
             Models.Clear();
             FileModel model = new FileModel() {FilePath = FilePath, Name = Path.GetFileNameWithoutExtension(FilePath)};
             Models.Add(new SampleViewModel() { FileModel = model, Pos = Models.Count });
         }
 
+        private void PreprocessSamples()
+        {
+            foreach (SampleViewModel model in Models.ToList())
+            {
+                if (!File.Exists(model.FileModel.FilePath))
+                {
+                    Models.Remove(model);
+                }
+            }
+        }
+
         private async Task PerformScan(bool fast = true)
         {
             ProgressDialogController controller = await ((MetroWindow)Application.Current.MainWindow).ShowProgressAsync("Please wait", "Scan in progress...");
             controller.SetIndeterminate();
+
+            PreprocessSamples();
+
             foreach (var model in Models)
             {
                 FileModel fileModel = model.FileModel;
+
+                _fileTypeChecker.IsValid(fileModel.FilePath);
 
                 if (fast)
                 {
@@ -131,6 +175,35 @@ namespace PVBPS_Antivirus.ViewModels
             }
 
             await controller.CloseAsync();
+
+            var infected = Models.Where(t => !t.FileModel.IsClean).Select(t => t.FileModel.Name).ToList();
+
+            if (!infected.Any())
+            {
+                return;
+            }
+
+            string quarantineMessage =
+                $"These files are infected:\n{string.Join("\n", infected)}\nDo you want to move them to quarantine ?";
+
+            MetroDialogSettings settings = new MetroDialogSettings()
+            {
+                AffirmativeButtonText = "Yes",
+                NegativeButtonText = "No"
+            };
+            MessageDialogResult dialogResult = await ((MetroWindow)Application.Current.MainWindow).ShowMessageAsync("Scan complete", quarantineMessage, MessageDialogStyle.AffirmativeAndNegative, settings);
+
+            if (dialogResult == MessageDialogResult.Affirmative)
+            {
+                var infectedFiles = Models.Where(t => !t.FileModel.IsClean).Select(t => t.FileModel.FilePath).ToList();
+                var notMoved = _scanner.MoveFilesToQurantine(infectedFiles);
+
+                if (notMoved.Any())
+                {
+                    await ((MetroWindow) Application.Current.MainWindow).ShowMessageAsync("Scan complete",
+                        $"{Models.Count - notMoved.Count} out of {Models.Count} moved");
+                }
+            }
         }
     }
 }

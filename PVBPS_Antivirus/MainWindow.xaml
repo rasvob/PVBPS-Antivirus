@@ -21,7 +21,7 @@
         <converters:SampleStateValueConverter x:Key="SampleStateValueConverter" />
         <converters:SampleStateColorValueConverter x:Key="SampleStateColorValueConverter" />
     </controls:MetroWindow.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -60,9 +60,9 @@
         
         <Grid Grid.Row="2">
             <ScrollViewer x:Name="ScanScrollViewer">
-                <ListBox ItemsSource="{Binding Models, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                <ItemsControl ItemsSource="{Binding Models, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                          PreviewMouseWheel="UIElement_OnPreviewMouseWheel">
-                    <ListBox.ItemTemplate>
+                    <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Vertical" Margin="0,0,0,10">
                                 <StackPanel Orientation="Horizontal">
@@ -70,101 +70,149 @@
                                     <Label FontWeight="Bold" FontSize="18" Content="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateValueConverter}}" Foreground="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateColorValueConverter}}" />
                                     <Label FontSize="18" Content="{Binding FileModel.ScanTime}" />
                                 </StackPanel>
-                                
-                                <TextBox 
-                                         controls:TextBoxHelper.UseFloatingWatermark="True"
-                                         controls:TextBoxHelper.Watermark="Sample name"
-                                         controls:TextBoxHelper.WatermarkAlignment="Left"
-                                         IsReadOnly="True"
-                                         Text="{Binding FileModel.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                         Margin="0,0,5,5"
-                                />
+                                <Expander Header="Scan results">
+                                    <StackPanel>
+                                        <TextBox 
+                                             controls:TextBoxHelper.UseFloatingWatermark="True"
+                                             controls:TextBoxHelper.Watermark="Sample name"
+                                             controls:TextBoxHelper.WatermarkAlignment="Left"
+                                             IsReadOnly="True"
+                                             Text="{Binding FileModel.Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="0,0,5,5"
+                                        />
 
-                                <TextBox 
-                                    controls:TextBoxHelper.UseFloatingWatermark="True"
-                                    controls:TextBoxHelper.Watermark="File path"
-                                    controls:TextBoxHelper.WatermarkAlignment="Left"
-                                    IsReadOnly="True"
-                                    Text="{Binding FileModel.FilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Margin="0,0,5,5"
-                                />
+                                        <TextBox 
+                                        controls:TextBoxHelper.UseFloatingWatermark="True"
+                                        controls:TextBoxHelper.Watermark="File path"
+                                        controls:TextBoxHelper.WatermarkAlignment="Left"
+                                        IsReadOnly="True"
+                                        Text="{Binding FileModel.FilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Margin="0,0,5,5"
+                                        />
 
-                                <Label FontSize="14" Content="Hash" FontWeight="Bold"></Label>
-                                <TextBox 
-                                    controls:TextBoxHelper.UseFloatingWatermark="True"
-                                    controls:TextBoxHelper.Watermark="MD5"
-                                    controls:TextBoxHelper.WatermarkAlignment="Left"
-                                    IsReadOnly="True"
-                                    Text="{Binding FileModel.Md5Hash, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Margin="0,0,5,5"
-                                />
+                                        <Label FontSize="14" Content="File info" FontWeight="Bold"></Label>
+                                        <TextBox 
+                                            controls:TextBoxHelper.UseFloatingWatermark="True"
+                                            controls:TextBoxHelper.Watermark="File size"
+                                            controls:TextBoxHelper.WatermarkAlignment="Left"
+                                            IsReadOnly="True"
+                                            Text="{Binding FileModel.FileSize, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Margin="0,0,5,5"
+                                        />
+                                        
+                                        <TextBox 
+                                            controls:TextBoxHelper.UseFloatingWatermark="True"
+                                            controls:TextBoxHelper.Watermark="Product name"
+                                            controls:TextBoxHelper.WatermarkAlignment="Left"
+                                            IsReadOnly="True"
+                                            Text="{Binding FileModel.FileVersionInfo.ProductName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Margin="0,0,5,5"
+                                        />
 
-                                <TextBox 
-                                    controls:TextBoxHelper.UseFloatingWatermark="True"
-                                    controls:TextBoxHelper.Watermark="SHA1"
-                                    controls:TextBoxHelper.WatermarkAlignment="Left"
-                                    IsReadOnly="True"
-                                    Text="{Binding FileModel.Sha1Hash, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Margin="0,0,5,5"
-                                />
+                                        <TextBox 
+                                            controls:TextBoxHelper.UseFloatingWatermark="True"
+                                            controls:TextBoxHelper.Watermark="Original filename"
+                                            controls:TextBoxHelper.WatermarkAlignment="Left"
+                                            IsReadOnly="True"
+                                            Text="{Binding FileModel.FileVersionInfo.OriginalFilename, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Margin="0,0,5,5"
+                                        />
 
-                                <TextBox 
-                                    controls:TextBoxHelper.UseFloatingWatermark="True"
-                                    controls:TextBoxHelper.Watermark="SHA256"
-                                    controls:TextBoxHelper.WatermarkAlignment="Left"
-                                    IsReadOnly="True"
-                                    Text="{Binding FileModel.Sha256Hash, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Margin="0,0,5,5"
-                                />
+                                        <TextBox 
+                                            controls:TextBoxHelper.UseFloatingWatermark="True"
+                                            controls:TextBoxHelper.Watermark="File version"
+                                            controls:TextBoxHelper.WatermarkAlignment="Left"
+                                            IsReadOnly="True"
+                                            Text="{Binding FileModel.FileVersionInfo.FileVersion, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Margin="0,0,5,5"
+                                        />
 
-                                <Label FontSize="14" Content="Detected signatures" FontWeight="Bold"></Label>
-                                <ListBox ItemsSource="{Binding FileModel.MatchedSignatures, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <Label Content="{Binding}" />
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
+                                        <Label FontSize="14" Content="Hash" FontWeight="Bold"></Label>
+                                        <TextBox 
+                                        controls:TextBoxHelper.UseFloatingWatermark="True"
+                                        controls:TextBoxHelper.Watermark="MD5"
+                                        controls:TextBoxHelper.WatermarkAlignment="Left"
+                                        IsReadOnly="True"
+                                        Text="{Binding FileModel.Md5Hash, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Margin="0,0,5,5"
+                                        />
 
-                                <Label FontSize="14" FontWeight="Bold" Content="Online scan" />
-                                <StackPanel Orientation="Horizontal">
-                                    <Label FontSize="14" FontWeight="Bold" Content="{Binding FileModel.VirusTotalReport.Positives, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                    <Label FontSize="14" Content="positive scans of" />
-                                    <Label FontSize="14" FontWeight="Bold" Content="{Binding FileModel.VirusTotalReport.Total, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                    <Label FontSize="14" Content="total scans" />
-                                </StackPanel>
+                                        <TextBox 
+                                        controls:TextBoxHelper.UseFloatingWatermark="True"
+                                        controls:TextBoxHelper.Watermark="SHA1"
+                                        controls:TextBoxHelper.WatermarkAlignment="Left"
+                                        IsReadOnly="True"
+                                        Text="{Binding FileModel.Sha1Hash, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Margin="0,0,5,5"
+                                        />
 
-                                <DataGrid ItemsSource="{Binding FileModel.VirusTotalReport.Scans, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                          AutoGenerateColumns="False"
-                                          CanUserAddRows="False"
-                                          CanUserDeleteRows="False"
-                                          CanUserReorderColumns="True"
-                                          CanUserResizeColumns="True"
-                                          CanUserResizeRows="True"
-                                          CanUserSortColumns="True">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn IsReadOnly="True" Binding="{Binding AvName}" Header="Antivirus" />
-                                        <DataGridTextColumn IsReadOnly="True" Binding="{Binding Result}" Header="Detected as" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <!--<ListBox ItemsSource="{Binding FileModel.VirusTotalReport.Scans, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Label Content="AV: " />
-                                                <Label Content="{Binding AvName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBox 
+                                        controls:TextBoxHelper.UseFloatingWatermark="True"
+                                        controls:TextBoxHelper.Watermark="SHA256"
+                                        controls:TextBoxHelper.WatermarkAlignment="Left"
+                                        IsReadOnly="True"
+                                        Text="{Binding FileModel.Sha256Hash, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Margin="0,0,5,5"
+                                        />
 
-                                                <Label Content="Detected: " />
-                                                <Label Content="{Binding Result, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>-->
+                                        <Label FontSize="14" Content="Detected signatures" FontWeight="Bold"></Label>
+                                        <ListBox ItemsSource="{Binding FileModel.MatchedSignatures, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Label Content="{Binding}">
+                                                        <Label.ContextMenu>
+                                                            <ContextMenu>
+                                                                <MenuItem Header="Copy to clipboard" Click="ClipBoardMenuItem_OnClick" Tag="{Binding}"></MenuItem>
+                                                            </ContextMenu>
+                                                        </Label.ContextMenu>
+                                                    </Label>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+
+                                        <Label FontSize="14" Content="Detected URLs" FontWeight="Bold"></Label>
+                                        <ListBox ItemsSource="{Binding FileModel.Urls, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,5,0">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Label Content="{Binding}">
+                                                        <Label.ContextMenu>
+                                                            <ContextMenu>
+                                                                <MenuItem Header="Copy to clipboard" Click="ClipBoardMenuItem_OnClick" Tag="{Binding}"></MenuItem>
+                                                            </ContextMenu>
+                                                        </Label.ContextMenu>
+                                                    </Label>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+
+                                        <Label FontSize="14" FontWeight="Bold" Content="Online scan" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label FontSize="14" FontWeight="Bold" Content="{Binding FileModel.VirusTotalReport.Positives, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <Label FontSize="14" Content="positive scans of" />
+                                            <Label FontSize="14" FontWeight="Bold" Content="{Binding FileModel.VirusTotalReport.Total, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <Label FontSize="14" Content="total scans" />
+                                        </StackPanel>
+
+                                        <DataGrid ItemsSource="{Binding FileModel.VirusTotalReport.Scans, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                              AutoGenerateColumns="False"
+                                              CanUserAddRows="False"
+                                              CanUserDeleteRows="False"
+                                              CanUserReorderColumns="True"
+                                              CanUserResizeColumns="True"
+                                              CanUserResizeRows="True"
+                                              CanUserSortColumns="True">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn IsReadOnly="True" Binding="{Binding AvName}" Header="Antivirus" />
+                                                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Result}" Header="Detected as" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
+                                </Expander>
 
                             </StackPanel>
                         </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
         </Grid>
 

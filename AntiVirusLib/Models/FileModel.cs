@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 using AntiVirusLib.Database;
 using AntiVirusLib.Signatures;
+using PeNet;
 
 namespace AntiVirusLib.Models
 {
@@ -16,9 +18,12 @@ namespace AntiVirusLib.Models
         public string Sha1Hash { get; set; }
         public string Sha256Hash { get; set; }
         public List<string> MatchedSignatures { get; set; }
+        public List<string> Urls { get; set; }
         public DateTime ScanTime { get; set; }
         public bool IsClean { get; set; } = true;
         public VirusTotalReport VirusTotalReport { get; set; }
+        public FileVersionInfo FileVersionInfo { get; set; }
+        public string FileSize { get; set; }
 
         public XElement ToXml()
         {
@@ -41,6 +46,7 @@ namespace AntiVirusLib.Models
         public FileModel()
         {
             MatchedSignatures = new List<string>();
+            Urls = new List<string>();
             VirusTotalReport = new VirusTotalReport();
         }
 
@@ -86,6 +92,14 @@ namespace AntiVirusLib.Models
             Md5Hash = hash.CreateMd5Hash(FilePath);
             Sha1Hash = hash.CreateSha1Hash(FilePath);
             Sha256Hash = hash.CreateSha256Hash(FilePath);
+        }
+
+        public void CreateFileInfo()
+        {
+            FileVersionInfo = FileVersionInfo.GetVersionInfo(FilePath);
+            System.IO.FileInfo info = new System.IO.FileInfo(FilePath);
+            long length = info.Length;
+            FileSize = $"{(length / (Math.Pow(2, 20))):F3} MiB";
         }
 
         public void RefreshModel(FileModel model)
