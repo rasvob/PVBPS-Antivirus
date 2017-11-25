@@ -84,7 +84,7 @@ namespace PVBPS_Antivirus.ViewModels
                 }
 
                 List<string> invalidFiles = models.Where(t => !_fileTypeChecker.IsValid(t.FilePath))
-                    .Select(t => Path.GetFileNameWithoutExtension(t.FilePath)).ToList();
+                    .Select(t => Path.GetFileName(t.FilePath)).ToList();
 
                 if (invalidFiles.Any())
                 {
