@@ -64,6 +64,7 @@
     </ApplicationDefinition>
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\Converters\DetectedByValueConverter.cs" />
     <Compile Include="ViewModels\Converters\SampleStateColorValueConverter.cs" />
     <Compile Include="ViewModels\Converters\SampleStateValueConverter.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

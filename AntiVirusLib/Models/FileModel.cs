@@ -24,6 +24,7 @@ namespace AntiVirusLib.Models
         public VirusTotalReport VirusTotalReport { get; set; }
         public FileVersionInfo FileVersionInfo { get; set; }
         public string FileSize { get; set; }
+        public string DetectedBy { get; set; }
 
         public XElement ToXml()
         {

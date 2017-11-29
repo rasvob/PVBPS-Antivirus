@@ -20,6 +20,7 @@
     <controls:MetroWindow.Resources>
         <converters:SampleStateValueConverter x:Key="SampleStateValueConverter" />
         <converters:SampleStateColorValueConverter x:Key="SampleStateColorValueConverter" />
+        <converters:DetectedByValueConverter x:Key="DetectedByValueConverter"></converters:DetectedByValueConverter>
     </controls:MetroWindow.Resources>
 
     <Grid>
@@ -69,6 +70,7 @@
                                     <Label FontWeight="Bold" FontSize="18" Content="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <Label FontWeight="Bold" FontSize="18" Content="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateValueConverter}}" Foreground="{Binding FileModel, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource SampleStateColorValueConverter}}" />
                                     <Label FontSize="18" Content="{Binding FileModel.ScanTime}" />
+                                    <Label FontSize="18" Content="{Binding FileModel.DetectedBy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DetectedByValueConverter}}" />
                                 </StackPanel>
                                 <Expander Header="Scan results">
                                     <StackPanel>
